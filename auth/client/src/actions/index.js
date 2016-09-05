@@ -24,6 +24,22 @@ export function signinUser({ email, password }) {
     };
 }
 
+export function signupUser({ email, password }) {
+    return function(dispatch) {
+        axios.post(`${ROOT_URL}/signup`, { email, password })
+            .then((response) => {
+                dispatch({ type: AUTH_USER });
+
+                localStorage.setItem('token', response.data.token);
+
+                browserHistory.push('/feature');
+            })
+            .catch((response) => {
+                dispatch(authError('Email is already in use'));
+            });
+    }
+}
+
 export function signOutUser() {
     localStorage.removeItem('token');
 
@@ -36,5 +52,19 @@ export function authError(error) {
     return {
         type: AUTH_ERROR,
         payload: error
+    }
+}
+
+export function fetchMessage() {
+    return function(dispatch) {
+        axios.get(ROOT_URL,
+            {
+                headers: {
+                    authorization: localStorage.getItem('token')
+                }
+            })
+            .then((response) => {
+
+            })
     }
 }

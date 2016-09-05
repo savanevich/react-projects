@@ -5,7 +5,7 @@ import * as actions from '../../actions';
 class SignUp extends Component {
 
     handleFormSubmit({ email, password }) {
-        this.props.signinUser({ email, password });
+        this.props.signupUser({ email, password });
     }
 
     renderAlert() {
@@ -19,7 +19,11 @@ class SignUp extends Component {
     }
 
     render() {
-        const { handleSubmit, fields: { email, password } } = this.props;
+        const { handleSubmit, fields: {
+            email,
+            password,
+            passwordConfirm
+        } } = this.props;
 
         return (
             <form onSubmit={ handleSubmit(this.handleFormSubmit.bind(this)) }>
@@ -29,6 +33,7 @@ class SignUp extends Component {
                         { ...email }
                         type="text"
                         className="form-control" />
+                    { email.touched && email.error && <div className="error">{ email.error }</div> }
                 </fieldset>
                 <fieldset className="form-group">
                     <label>Password:</label>
@@ -36,16 +41,47 @@ class SignUp extends Component {
                         { ...password }
                         type="password"
                         className="form-control" />
+                    { password.touched && password.error && <div className="error">{ password.error }</div> }
+                </fieldset>
+                <fieldset className="form-group">
+                    <label>Confirm Password:</label>
+                    <input
+                        { ...passwordConfirm }
+                        type="password"
+                        className="form-control" />
+                    { passwordConfirm.touched && passwordConfirm.error && <div className="error">{ passwordConfirm.error }</div> }
                 </fieldset>
                 { this.renderAlert() }
                 <button
                     action="submit"
                     className="btn btn-primary">
-                    Sign in
+                    Sign up
                 </button>
             </form>
         );
     }
+}
+
+function validate(formProps) {
+    const errors = {};
+
+    if (!formProps.email) {
+        errors.email = 'Please enter an email';
+    }
+
+    if (!formProps.password) {
+        errors.password = 'Please enter an password';
+    }
+
+    if (!formProps.passwordConfirm) {
+        errors.passwordConfirm = 'Please enter an password confirmation';
+    }
+
+    if (formProps.password !== formProps.passwordConfirm) {
+        errors.passwordConfirm = 'Passwords must match';
+    }
+
+    return errors;
 }
 
 function mapStateToProps(state) {
@@ -53,6 +89,7 @@ function mapStateToProps(state) {
 }
 
 export default reduxForm({
-    form: 'signin',
-    fields: ['email', 'password']
+    form: 'signup',
+    fields: ['email', 'password', 'passwordConfirm'],
+    validate
 }, mapStateToProps, actions)(SignUp);
